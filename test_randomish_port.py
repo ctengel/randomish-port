@@ -64,7 +64,7 @@ def test_gen_alphanum():
     assert sum(alphanum_list) == 676
 
 def test_port_assign():
-    assert randomish_port.port_assign(1, "CE") == 1024 + 3 * 32 + 5
+    assert randomish_port.port_assign(1024, "CE") == 1024 + 3 * 32 + 5
 
 def test_reverse_port_lookup():
     letters, start_port = randomish_port.reverse_port_lookup(1024 + 3 * 32 + 5)
@@ -98,8 +98,8 @@ def test_open_counts():
 def test_pick_a_start():
     port_list = fake_port_list()
     start, count = randomish_port.pick_a_start(port_list)
-    assert start > 0
-    assert start < 48
+    assert start > 1024
+    assert start < 48 * 1024
     assert count > 676/2
 
 def test_load_iana_list():

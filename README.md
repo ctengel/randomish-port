@@ -94,10 +94,9 @@ FUNCTIONS
         port_list is a list of ports whether they are available or not
 
     port_assign(start: int, chars: str) -> int
-        Given a start/1024 and two characters, assign a port
+        Given a start and two characters, assign a port
 
-        Note that the 'start' specified needs to be the actual start port / 1024
-        The port that is returned though is the actual port number
+        Note that the 'start' specified needs to be the actual start port
 
     reverse_port_lookup(port_number: int) -> tuple[str, int]
         Given a port number, return the 2-letter code
@@ -109,8 +108,8 @@ Select a range randomly
 
 ```
 >>> port_list = randomish_port.load_iana_list()
->>> start_port, available = randomish_port.pick_a_start(port_list)
->>> start_port * 1024
+>>> start_port, _ = randomish_port.pick_a_start(port_list)
+>>> start_port
 35840
 ```
 
@@ -124,7 +123,7 @@ Assign a port:
 36432
 ```
 
-36432 is the port for the RP service. (note that start_port is actually 35 = 35480/1024)
+36432 is the port for the RP service
 
 Reverse lookup:
 

@@ -102,19 +102,23 @@ def pick_a_start(port_list: list[bool]) -> tuple[int, int]:
     while True:
         selected_start = random.choices(range(64), weights=weights)[0]
         if weights[selected_start] > med:
-            return selected_start, opencounts_a[selected_start]
+            return selected_start * 1024, opencounts_a[selected_start]
 
-def port_assign(start: int, chars: str) -> int:
-    """Given a start/1024 and two characters, assign a port
-
-    Note that the 'start' specified needs to be the actual start port / 1024
-    The port that is returned though is the actual port number
-    """
+def _port_assign(start: int, chars: str) -> int:
     letters = [ord(x) for x in chars]
     assert len(letters) == 2
     for letter in letters:
         assert letter in range(64, 96)
     return (start*1024) + ((letters[0] % 32) * 32) + (letters[1] % 32)
+
+def port_assign(start: int, chars: str) -> int:
+    """Given a start and two characters, assign a port
+
+    Note that the 'start' specified needs to be the actual start port
+    """
+    block_number, remainder = divmod(start, 1024)
+    assert remainder == 0
+    return _port_assign(block_number, chars)
 
 def reverse_port_lookup(port_number: int) -> tuple[str, int]:
     """Given a port number, return the 2-letter code
@@ -136,11 +140,10 @@ def cmd():
     args = parser.parse_args()
     port_list = load_iana_list(args.iana_file)
     if args.start_port:
-        start = int(int(args.start_port)/1024)
-        assert int(args.start_port) % 1024 == 0
+        start = int(args.start_port)
     else:
         start, quality = pick_a_start(port_list)
-        print(start*1024, quality)
+        print(start, quality)
     port = port_assign(start, args.letters.upper())
     print(port)
     assert port_list[port]
