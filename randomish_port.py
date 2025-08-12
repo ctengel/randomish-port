@@ -87,6 +87,16 @@ def port_assign(start, chars):
         assert letter in range(64, 96)
     return (start*1024) + ((letters[0] % 32) * 32) + (letters[1] % 32)
 
+def reverse_port_lookup(port_number: int) -> tuple[str, int]:
+    """Given a port number, return the 2-letter code
+
+    Also returns the 'start port' of the range.
+    """
+    msb, lsb = divmod(port_number, 1024)
+    start_port = msb * 1024
+    letter_nums = divmod(lsb, 32)
+    letters = ''.join([chr(num + 64) for num in letter_nums])
+    return letters, start_port
 
 def cmd():
     """CMD line interface"""
