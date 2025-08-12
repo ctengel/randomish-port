@@ -6,14 +6,17 @@ import argparse
 import csv
 import statistics
 import random
-#import requests
+import io
+import requests
 
 
-IANA_LIST = 'Downloads/service-names-port-numbers.csv'
+IANA_LIST = 'https://www.iana.org/assignments/service-names-port-numbers/' \
+            'service-names-port-numbers.csv'
 MIN_PORT = 1024
 MAX_PORT = 49151
 
-def csv2list(csvreader):
+
+def csv2list(csvreader: csv.DictReader) -> list[bool]:
     """Turn a CSV DictReader into a list of True or False available ports"""
     full_list = [False] * 65536
     for line in csvreader:
@@ -34,7 +37,7 @@ def csv2list(csvreader):
             full_list[port] = True
     return full_list
 
-def gen_alphanum():
+def gen_alphanum() -> list[bool]:
     """Assuming 2 5-bit ASCII letters, return true/false list
 
     True is all the used numbers, False would be for non-alphabetic combos
@@ -46,15 +49,14 @@ def gen_alphanum():
             char_list[chars] = True
     return char_list
 
-def open_count(full_list):
+def open_count(full_list: list[bool]) -> int:
     """Return a list of available ports for each block of 1024 ports"""
     msb_counts = [0] * 64
     for msb in range(64):
         msb_counts[msb] = sum(full_list[msb*1024:(msb+1)*1024])
     return msb_counts
 
-
-def open_count_alpha(full_list):
+def open_count_alpha(full_list: list[bool]) -> int:
     """Return a list of available alphabetically significant ports for each block of 1024 ports"""    
     msb_counts = [0] * 64
     alphanum = gen_alphanum()
@@ -62,14 +64,22 @@ def open_count_alpha(full_list):
         msb_counts[msb] = sum(a and b for a, b in zip(full_list[msb*1024:(msb+1)*1024], alphanum))
     return msb_counts
 
-def load_iana_list():
+def load_iana_list(filename: str = None) -> list[bool]:
     """Load IANA port CSV list from a file"""
-    with open(IANA_LIST, newline='', encoding='utf-8') as csvfile:
-        port_list = csv2list(csv.DictReader(csvfile))
+    if filename:
+        with open(filename, newline='', encoding='utf-8') as csvfile:
+            port_list = csv2list(csv.DictReader(csvfile))
+        return port_list
+    result = requests.get(IANA_LIST, timeout=5)
+    result.raise_for_status()
+    port_list = csv2list(csv.DictReader(io.StringIO(result.text)))
     return port_list
 
-def pick_a_start(port_list):
-    """Randomly pick a start port and list how many are available"""
+def pick_a_start(port_list: list[bool]) -> tuple[int, int]:
+    """Randomly pick a start port and list how many are available
+
+    port_list is a list of ports whether they are available or not
+    """
     opencounts = open_count(port_list)
     opencounts_a = open_count_alpha(port_list)
     weights = [a/1024.0 + b/676.0 for a, b in zip(opencounts, opencounts_a)]
@@ -79,8 +89,12 @@ def pick_a_start(port_list):
         if weights[selected_start] > med:
             return selected_start, opencounts_a[selected_start]
 
-def port_assign(start, chars):
-    """Given a start/1024 and two characters, assign a port"""
+def port_assign(start: int, chars: str) -> int:
+    """Given a start/1024 and two characters, assign a port
+
+    Note that the 'start' specified needs to be the actual start port / 1024
+    The port that is returned though is the actual port number
+    """
     letters = [ord(x) for x in chars]
     assert len(letters) == 2
     for letter in letters:
@@ -102,10 +116,10 @@ def cmd():
     """CMD line interface"""
     parser = argparse.ArgumentParser()
     parser.add_argument('letters')
-    #parser.add_argument('-i', '--iana-file')
+    parser.add_argument('-i', '--iana-file')
     parser.add_argument('-s', '--start-port')
     args = parser.parse_args()
-    port_list = load_iana_list()
+    port_list = load_iana_list(args.iana_file)
     if args.start_port:
         start = int(int(args.start_port)/1024)
         assert int(args.start_port) % 1024 == 0
