@@ -40,13 +40,11 @@ $ pip install randomish-port
 
 ## Run CLI
 
-(NOTE: CLI is not currently installed. You need to untar https://github.com/ctengel/randomish-port/archive/refs/tags/v0.1.0.tar.gz locally)
-
 Help:
 
 ```
-$ ./randomish_port.py -h
-usage: randomish_port.py [-h] [-i IANA_FILE] [-s START_PORT] letters
+$ randomish-port -h
+usage: randomish-port [-h] [-i IANA_FILE] [-s START_PORT] letters
 
 positional arguments:
   letters
@@ -61,7 +59,7 @@ Assign a random from a new random range:
 
 
 ```
-$ ./randomish_port.py rp
+$ randomish-port rp
 35840 669
 36432
 ```
@@ -71,7 +69,7 @@ The range is 35840+; there are 669 available ports.  The port for service RP is 
 Find an additional port in the same range
 
 ```
-$ ./randomish_port.py -s 35840 ce
+$ randomish-port -s 35840 ce
 35941
 ```
 
