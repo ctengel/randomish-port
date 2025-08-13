@@ -1,0 +1,18 @@
+[project]
+name = "randomish-port"
+version = "0.1.0"
+description = "Small Python script to generate a randomish unregistered port"
+readme = "README.md"
+requires-python = ">=3.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+
+[project.urls]
+Homepage = "https://github.com/ctengel/randomish-port"
+
+[tool.setuptools]
+py-modules = ["randomish_port"]
