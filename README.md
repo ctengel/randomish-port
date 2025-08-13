@@ -27,15 +27,20 @@ The advantages of this vs random or using lazy defaults:
 - Can hard-code default ports in clients, vs always having to look up and specify random port
 - Allows one to attempt to register with IANA in the future if desired (probably rare but nice to have)
 
+## Links
+
+- https://github.com/ctengel/randomish-port
+- https://pypi.org/project/randomish-port/
+
 ## Install
 
 ```
-$ git clone https://github.com/ctengel/randomish-port.git
-$ cd randomish-port
-$ pip install -r requirements.txt
+$ pip install randomish-port
 ```
 
 ## Run CLI
+
+(NOTE: CLI is not currently installed. You need to untar https://github.com/ctengel/randomish-port/archive/refs/tags/v0.1.0.tar.gz locally)
 
 Help:
 
